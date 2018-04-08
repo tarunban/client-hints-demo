@@ -18,7 +18,7 @@ import webapp2
 class MainPage(webapp2.RequestHandler):
     def get(self):
     	self.response.headers['Accept-CH-Lifetime'] = '300'
-        self.response.headers['Accept-CH'] = 'device-memory, dpr, width, viewport-width'
+        self.response.headers['Accept-CH'] = 'device-memory, dpr, width, viewport-width, rtt, downlink, ect'
 
         self.response.write('''
             <!DOCTYPE html>\n
