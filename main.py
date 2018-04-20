@@ -17,7 +17,7 @@ import webapp2
 
 class MainPage(webapp2.RequestHandler):
     def get(self):
-    	self.response.headers['Accept-CH-Lifetime'] = '300'
+        self.response.headers['Accept-CH-Lifetime'] = '300'
         self.response.headers['Accept-CH'] = 'device-memory, dpr, width, viewport-width, rtt, downlink, ect'
 
         self.response.write('''
@@ -131,7 +131,7 @@ class MainPage(webapp2.RequestHandler):
             <p style="line-height:1.5">
             On every visit to this webpage, the server sets
             <b><font face=\"arial\">Accept-CH</font></b> response header to
-            <b><font face=\"arial\">device-memory, DPR, width, Viewport-Width</font></b>
+            <b><font face=\"arial\">device-memory, DPR, width, Viewport-Width, rtt, downlink, ect</font></b>
             and
             <b><font face=\"arial\">Accept-CH-Lifetime</font></b> response header
             to
@@ -140,7 +140,7 @@ class MainPage(webapp2.RequestHandler):
 
             If the user revisits the webpage within 300 seconds of last visit, the browser
             would
-            set device-memory, DPR, Viewport-Width on the request headers to the main frame
+            set device-memory, DPR, Viewport-Width, rtt, downlink, ect on the request headers to the main frame
             as well
             as subresources.
 
@@ -159,9 +159,9 @@ class MainPage(webapp2.RequestHandler):
                 key.lower() == "width" or key.lower() == "viewport-width" or\
                 key.lower() == "rtt" or key.lower() == "downlink" or\
                 key.lower() == "ect":
-    	            self.response.write("<b>" + key+": " +"</b>")	;        
-    	            self.response.write(self.request.headers[key]);
-    	            self.response.write("<br><br>");
+                    self.response.write("<b>" + key+": " +"</b>")   ;        
+                    self.response.write(self.request.headers[key]);
+                    self.response.write("<br><br>");
         self.response.write("<p id=\"toWrite\"></p>");
         self.response.write("<script src=\"subresource.js\"></script>");
         self.response.write('''
@@ -175,7 +175,7 @@ class MainPage(webapp2.RequestHandler):
 
 class IFramePage(webapp2.RequestHandler):
     def get(self):
-    	toWrite = "<h2>Subresource client hints received</h2>"
+        toWrite = "<h2>Subresource client hints received</h2>"
         for key in self.request.headers:
             if key.lower() == 'device-memory' or key.lower() == "dpr" or\
                 key.lower() == "width" or key.lower() == "viewport-width" or\
@@ -184,7 +184,7 @@ class IFramePage(webapp2.RequestHandler):
                     toWrite = toWrite + "<b>" + key+ ": " +"</b>";
                     toWrite = toWrite +  self.request.headers[key] ;
                     toWrite = toWrite + "<br><br>";
-	        
+            
         self.response.write("document.getElementById(\"toWrite\").innerHTML =\"" + toWrite  + "\"")
 
 app = webapp2.WSGIApplication([
