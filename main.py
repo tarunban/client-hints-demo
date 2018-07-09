@@ -17,7 +17,7 @@ import webapp2
 
 class MainPage(webapp2.RequestHandler):
     def get(self):
-        self.response.headers['Accept-CH-Lifetime'] = '300'
+    	self.response.headers['Accept-CH-Lifetime'] = '60'
         self.response.headers['Accept-CH'] = 'device-memory, dpr, width, viewport-width, rtt, downlink, ect'
 
         self.response.write('''
@@ -53,8 +53,13 @@ class MainPage(webapp2.RequestHandler):
             <a href="https://tools.ietf.org/html/draft-ietf-httpbis-client-hints-05#section-2.2.2">
             Accept-CH-Lifetime
             </a>
-            response headers to indicate to 
+            <b>response headers</b> to indicate to 
             the user agent which Client Hint request headers should be sent on requests.
+            </p>
+
+            <p>
+            For demo of use of client hints meta http-equiv headers, check out
+            this <a href="http-equiv.html">link</a>.
             </p>
             ''');
 
@@ -69,7 +74,7 @@ class MainPage(webapp2.RequestHandler):
 
             <p style="line-height:1.5">
             A user agent that receives above Accept-CH and Accept-CH-Lifetime response headers,
-            or via HTML meta element with http-equiv attribute, should append DPR and
+            or via HTML meta element with <a href="http-equiv.html">http-equiv attribute</a>, should append DPR and
             Viewport-Width request header fields and remember this preference for 86400 seconds.
             If the Accept-CH-Lifetime duration is omitted, then the opt-in only applies for subresource
             requests of the document advertising the Accept-CH policy.
@@ -135,10 +140,105 @@ class MainPage(webapp2.RequestHandler):
             and
             <b><font face=\"arial\">Accept-CH-Lifetime</font></b> response header
             to
-            <b><font face=\"arial\">300</font></b> seconds.
+            <b><font face=\"arial\">60</font></b> seconds.
 
 
-            If the user revisits the webpage within 300 seconds of last visit, the browser
+            If the user revisits the webpage within 60 seconds of last visit, the browser
+            would
+            set device-memory, DPR, Viewport-Width, rtt, downlink, ect on the request headers to the main frame
+            as well
+            as subresources.
+
+            You can also use
+            <a href="https://developers.google.com/web/tools/chrome-devtools/\
+            network-performance/reference#headers">
+            Chrome Devtools
+            </a>
+            to see the request and response headers.
+            </p>
+            ''');
+        
+        self.response.write("<h2>Main frame client hints received</h2>");
+        for key in self.request.headers:
+            if key.lower() == 'device-memory' or key.lower() == "dpr" or\
+                key.lower() == "width" or key.lower() == "viewport-width" or\
+                key.lower() == "rtt" or key.lower() == "downlink" or\
+                key.lower() == "ect":
+    	            self.response.write("<b>" + key+": " +"</b>")	;        
+    	            self.response.write(self.request.headers[key]);
+    	            self.response.write("<br><br>");
+        self.response.write("<p id=\"toWrite\"></p>");
+        self.response.write("<script src=\"subresource.js\"></script>");
+        self.response.write('''
+            </body>
+            <hr>
+            <font size=2>
+            <a href="https://github.com/tarunban/client-hints-demo">View on GitHub</a>.
+            </font>
+            </html>
+            ''');
+
+class HttpEquivPage(webapp2.RequestHandler):
+    def get(self):
+        self.response.write('''
+            <!DOCTYPE html>\n
+            <html>
+            <meta http-equiv="Accept-CH" content="device-memory, dpr, width, viewport-width, rtt, downlink, ect">
+            <meta http-equiv="Accept-CH-Lifetime" content="60">
+            <head>
+            <title>Client Hints Http-Equiv Demo</title>
+            </head>
+            <body>
+            ''');
+
+        self.response.write('''
+            <style>
+            li{
+            margin: 10px 0;
+            }
+            </style>
+            ''')
+
+        self.response.write('''
+            <h1>Background</h1>
+            <p style="line-height:1.5">
+            Available in 
+            <a href="https://www.chromestatus.com/feature/5713139295322112">Chrome 69+</a>.
+            </p>
+
+            <p style="line-height:1.5">
+            This demo illustrates the use of the
+            <a href="https://tools.ietf.org/html/draft-ietf-httpbis-client-hints-05#section-2.2.1">
+            Accept-CH
+            </a>
+            and
+            <a href="https://tools.ietf.org/html/draft-ietf-httpbis-client-hints-05#section-2.2.2">
+            Accept-CH-Lifetime
+            </a>
+            <b>meta http-equiv response headers</b> to indicate to 
+            the user agent which Client Hint request headers should be sent on requests.
+            </p>
+
+            <p>
+            For demo of use of client hints HTTP response headers, check out
+            this <a href="index.html">link</a>.
+            </p>
+            ''');
+
+        self.response.write('''
+            <h1>Http-Equiv Demo</h1>
+            <p style="line-height:1.5">
+            On every visit to this webpage, the server sets
+            <b><font face=\"arial\">Accept-CH</font></b> http-equiv header to
+            <b><font face=\"arial\">device-memory, DPR, width, Viewport-Width, rtt, downlink, ect</font></b>
+            and
+            <b><font face=\"arial\">Accept-CH-Lifetime</font></b> 
+            http-equiv header
+            to
+            <b><font face=\"arial\">60</font></b> seconds.
+
+
+            If the user revisits the webpage within 60 seconds of last visit, the browser
             would
             set device-memory, DPR, Viewport-Width, rtt, downlink, ect on the request headers to the main frame
             as well
@@ -175,7 +275,7 @@ class MainPage(webapp2.RequestHandler):
 
 class IFramePage(webapp2.RequestHandler):
     def get(self):
-        toWrite = "<h2>Subresource client hints received</h2>"
+    	toWrite = "<h2>Subresource client hints received</h2>"
         for key in self.request.headers:
             if key.lower() == 'device-memory' or key.lower() == "dpr" or\
                 key.lower() == "width" or key.lower() == "viewport-width" or\
@@ -184,10 +284,12 @@ class IFramePage(webapp2.RequestHandler):
                     toWrite = toWrite + "<b>" + key+ ": " +"</b>";
                     toWrite = toWrite +  self.request.headers[key] ;
                     toWrite = toWrite + "<br><br>";
-            
+	        
         self.response.write("document.getElementById(\"toWrite\").innerHTML =\"" + toWrite  + "\"")
 
 app = webapp2.WSGIApplication([
     ('/', MainPage),
+    ('/index.html', MainPage),
     ('/subresource.js', IFramePage),
+    ('/http-equiv.html', HttpEquivPage),
 ], debug=True)
